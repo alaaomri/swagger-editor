@@ -1,0 +1,5 @@
+{
+  "name": "Swagger Editor & Virtualization Configurator",
+  "description": "A React application to load a Swagger/OpenAPI JSON file, validate it, convert it to YAML, and apply user-defined modifications for API virtualization and CloudFlare API Shield configurations, then provide the final YAML for download.",
+  "requestFramePermissions": []
+}
