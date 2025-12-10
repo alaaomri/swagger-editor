@@ -139,3 +139,101 @@ export function validateYamlOpenApi(yamlContent: string): boolean {
     return false;
   }
 }
+
+/**
+ * Example modification functions for specific fixes.
+ * These can be expanded based on requirements.
+ */
+
+/**
+ 
+
+if (config.removeExplodeFalseProductCodes) {
+    const path = '/{baseSiteId}/offers/multi-product';
+    const method = 'get';
+    const operation = modifiedSpec.paths?.[path]?.[method];
+
+    if (operation && operation.parameters) {
+      const productCodesParam = operation.parameters.find(
+        (p: any) => p.name === 'productCodes' && p.in === 'query',
+      );
+      if (productCodesParam && productCodesParam.explode === false) {
+        delete productCodesParam.explode;
+        console.log(`Removed 'explode: false' from 'productCodes' param on ${method.toUpperCase()} ${path}`);
+      } else if (productCodesParam) {
+        console.warn(`Warning: 'productCodes' param on ${method.toUpperCase()} ${path} found, but 'explode: false' was not present.`);
+      } else {
+        console.warn(`Warning: 'productCodes' param not found on ${method.toUpperCase()} ${path}.`);
+      }
+    } else {
+      console.warn(`Warning: Operation ${method.toUpperCase()} ${path} not found or has no parameters.`);
+    }
+  }
+
+  if (config.applyFloaCallbackFix) {
+    const path = '/{baseSiteId}/floa/glFloaPaymentCallback';
+    const method = 'post';
+    const operation = modifiedSpec.paths?.[path]?.[method];
+
+    if (operation) {
+      // Remove 'dto' parameter
+      if (operation.parameters) {
+        const initialParamCount = operation.parameters.length;
+        operation.parameters = operation.parameters.filter(
+          (p: any) => p.name !== 'dto',
+        );
+        if (operation.parameters.length < initialParamCount) {
+          console.log(`Removed 'dto' parameter from ${method.toUpperCase()} ${path}`);
+        } else {
+          console.warn(`Warning: 'dto' parameter not found on ${method.toUpperCase()} ${path}.`);
+        }
+      }
+
+      // Add requestBody
+      if (!operation.requestBody) {
+        operation.requestBody = floaRequestBodyContent;
+        console.log(`Added requestBody to ${method.toUpperCase()} ${path}`);
+      } else {
+        console.warn(`Warning: requestBody already exists on ${method.toUpperCase()} ${path}. Not adding.`);
+      }
+    } else {
+      console.warn(`Warning: Operation ${method.toUpperCase()} ${path} not found.`);
+    }
+  }
+
+  if (config.addExplodeFalseCreateThreadMessageDto) {
+    const endpoints = [
+      '/{baseSiteId}/users/{userId}/consignment/{consignmentCode}/consignmententry/{consignmentEntryCode}/incident/close',
+      '/{baseSiteId}/users/{userId}/consignment/{consignmentCode}/consignmententry/{consignmentEntryCode}/incident/open',
+      '/{baseSiteId}/users/{userId}/messages/consignment/{consignmentCode}',
+      '/{baseSiteId}/users/{userId}/messages/threads/{threadId}',
+    ];
+    const paramName = 'createThreadMessageWsDTO';
+    const method = 'post'; // All these are POST requests
+
+    endpoints.forEach((path) => {
+      const operation = modifiedSpec.paths?.[path]?.[method];
+      if (operation && operation.parameters) {
+        const dtoParam = operation.parameters.find(
+          (p: any) => p.name === paramName && p.in === 'body', // Assuming 'body' for DTO
+        );
+        if (dtoParam && dtoParam.explode !== false) {
+          // Add explode: false if not already present or if it's true
+          dtoParam.explode = false;
+          console.log(`Added 'explode: false' to '${paramName}' param on ${method.toUpperCase()} ${path}`);
+        } else if (dtoParam && dtoParam.explode === false) {
+          console.log(`'explode: false' already present for '${paramName}' param on ${method.toUpperCase()} ${path}.`);
+        } else {
+          console.warn(`Warning: '${paramName}' param not found or is not a body parameter on ${method.toUpperCase()} ${path}.`);
+        }
+      } else if (operation && operation.requestBody && operation.requestBody.content?.['application/json']?.schema) {
+        // If it uses requestBody with schema, then explode:false is not applied to a parameter
+        // This case is unlikely for the prompt, but good to note.
+        console.warn(`Warning: Operation ${method.toUpperCase()} ${path} uses requestBody, '${paramName}' is not a direct parameter to add 'explode: false' to. This modification is only for parameters.`);
+      }
+      else {
+        console.warn(`Warning: Operation ${method.toUpperCase()} ${path} not found or has no parameters/requestBody.`);
+      }
+    });
+  }
+ */
