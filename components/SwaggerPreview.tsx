@@ -1,8 +1,6 @@
 import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
-// Note: The swagger-ui-react library itself includes its CSS.
-// No explicit CSS import is generally needed for basic usage.
 
 interface SwaggerPreviewProps {
   spec: object | null;
