@@ -27,7 +27,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, isLoading, error 
       <input
         type="file"
         id="file-upload"
-        accept=".json,.yaml,.yml"
+        accept=".json"
         onChange={handleFileChange}
         disabled={isLoading}
         className="hidden"
@@ -61,7 +61,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, isLoading, error 
       {error && (
         <div className="absolute mt-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm max-w-xs">
           <div className="flex items-start">
-            <svg className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg className="w-5 h-5 mr-2 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
             <span>{error}</span>

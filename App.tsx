@@ -31,11 +31,13 @@ const App: React.FC = () => {
     }
 
     try {
+      console.debug('File content loaded:', content);
       const parsedSpec = validateAndParseSwaggerJson(content);
       setOriginalSpec(parsedSpec);
       setFileState('loaded');
       setError(null);
     } catch (e: any) {
+      console.error('Error validating/parsing Swagger JSON:', e);
       setError(e.message);
       setFileState('error');
       setOriginalSpec(null);
