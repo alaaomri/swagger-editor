@@ -2,6 +2,10 @@
   "name": "gl-swaggereditor-virtualization-configurator",
   "description": "Gl swagger editor& virtualizationConfigurator",
   "private": true,
+  "github": {
+    "owner": "gl-open-source",
+    "repository": "https://github.com/alaaomri/swagger-editor"
+  },
   "version": "1.0.0",
   "type": "module",
   "scarfSettings": {
