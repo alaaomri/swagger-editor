@@ -33,7 +33,9 @@ const App: React.FC = () => {
 
     try {
       //console.debug('File content loaded:', content);
-      const parsedSpec = await validateAndParseSwaggerJson(content);
+      // get file extension to determine if YAML
+      const isYaml = name.endsWith('.yaml') || name.endsWith('.yml');
+      const parsedSpec = await validateAndParseSwaggerJson(content, isYaml);
       setOriginalSpec(parsedSpec.spec);
       parsedSpec.validationResult && setValidationResult(parsedSpec.validationResult);
       setFileState('loaded');

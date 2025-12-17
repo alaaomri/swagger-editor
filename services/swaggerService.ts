@@ -1,14 +1,14 @@
 import * as jsyaml from 'js-yaml';
 import type { OpenApiSpec, ModificationConfig, ValidationResult, OpenApiSpecWithMessages } from '../types';
 
-export async function validateSwaggerSchema(spec: OpenApiSpec): Promise<ValidationResult> {
+export async function validateSwaggerSchema(spec?: OpenApiSpec, yamlContent?: string, isYaml= false): Promise<ValidationResult> {
   try {
     const response = await fetch('https://validator.swagger.io/validator/debug', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': isYaml ? 'application/yaml' : 'application/json',
       },
-      body: JSON.stringify(spec),
+      body: isYaml ? yamlContent : JSON.stringify(spec),
     });
 
     if (!response.ok) {
@@ -27,13 +27,13 @@ export async function validateSwaggerSchema(spec: OpenApiSpec): Promise<Validati
  * @param content The string content of the file.
  * @returns The parsed OpenAPI spec object if valid, otherwise throws an error.
  */
-export async function validateAndParseSwaggerJson(content: string): Promise<OpenApiSpecWithMessages> {
+export async function validateAndParseSwaggerJson(content: string, isYaml = false): Promise<OpenApiSpecWithMessages> {
 
   let openapiSpec: OpenApiSpec;
   let result: OpenApiSpecWithMessages;
   try {
-    openapiSpec = JSON.parse(content);
-    const validationResult: ValidationResult = await validateSwaggerSchema(openapiSpec);
+    openapiSpec = isYaml ? jsyaml.load(content) as OpenApiSpec : JSON.parse(content);
+    const validationResult: ValidationResult = await validateSwaggerSchema(openapiSpec, content, isYaml);
     result = { spec: openapiSpec, validationResult };
   } catch (error) {
     return { spec: openapiSpec, validationResult: { schemaValidationMessages: [], messages: ['Failed to parse JSON: ' + (error as Error).message] } };
