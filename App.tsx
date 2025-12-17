@@ -4,7 +4,7 @@ import SwaggerEditor from './components/SwaggerEditor';
 import SwaggerPreview from './components/SwaggerPreview';
 import { validateAndParseSwaggerJson } from './services/swaggerService';
 import * as jsyaml from 'js-yaml';
-import { OpenApiSpec, FileState } from './types';
+import { OpenApiSpec, FileState, ValidationResult } from './types';
 
 const App: React.FC = () => {
   const [fileState, setFileState] = useState<FileState>('empty');
@@ -15,8 +15,9 @@ const App: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'yaml' | 'preview'>('yaml');
   const [version, setVersion] = useState<string>('');
+  const [validationResult, setValidationResult] = useState<ValidationResult>([]);
 
-  const handleFileLoaded = useCallback((content: string, name: string) => {
+  const handleFileLoaded = useCallback(async (content: string, name: string) => {
     setFileState('loading');
     setFileName(name);
     setError(null);
@@ -31,9 +32,10 @@ const App: React.FC = () => {
     }
 
     try {
-      console.debug('File content loaded:', content);
-      const parsedSpec = validateAndParseSwaggerJson(content);
-      setOriginalSpec(parsedSpec);
+      //console.debug('File content loaded:', content);
+      const parsedSpec = await validateAndParseSwaggerJson(content);
+      setOriginalSpec(parsedSpec.spec);
+      parsedSpec.validationResult && setValidationResult(parsedSpec.validationResult);
       setFileState('loaded');
       setError(null);
     } catch (e: any) {
@@ -41,6 +43,7 @@ const App: React.FC = () => {
       setError(e.message);
       setFileState('error');
       setOriginalSpec(null);
+      setValidationResult([{ schemaValidationMessages: [], messages: [e.message] }]);
     }
   }, []);
 
@@ -245,7 +248,7 @@ const App: React.FC = () => {
               
               {activeTab === 'preview' && (
                 <div className="h-full overflow-auto bg-white">
-                  <SwaggerPreview spec={modifiedSpecJson} />
+                  <SwaggerPreview spec={modifiedSpecJson} validationResult={validationResult} />
                 </div>
               )}
             </div>

@@ -48,10 +48,24 @@ export interface OpenApiSpec {
   [key: string]: any; // Allow for OpenAPI extensions like 'x-...'
 }
 
+export interface OpenApiSpecWithMessages {
+  spec: OpenApiSpec;
+  validationResult?: ValidationResult;
+}
+
 export interface ModificationConfig {
   version?: string;
   applyTimeObjectFix?: boolean;
   // Les autres champs existants peuvent rester, mais seront optionnels
+}
+export interface ValidationMessage {
+  level: 'ERROR' | 'WARNING' | 'INFO';
+  message: string[];
+}
+
+export interface ValidationResult {
+  schemaValidationMessages: ValidationMessage[];
+  messages: string[];
 }
 
 export type FileState = 'empty' | 'loading' | 'loaded' | 'error';

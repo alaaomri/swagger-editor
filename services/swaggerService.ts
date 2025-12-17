@@ -1,31 +1,56 @@
 import * as jsyaml from 'js-yaml';
-import { OpenApiSpec, ModificationConfig } from '../types';
+import type { OpenApiSpec, ModificationConfig, ValidationResult, OpenApiSpecWithMessages } from '../types';
+
+export async function validateSwaggerSchema(spec: OpenApiSpec): Promise<ValidationResult> {
+  try {
+    const response = await fetch('https://validator.swagger.io/validator/debug', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(spec),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Validation API request failed: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Swagger Validation Error:', error);
+    throw error;
+  }
+}
 
 /**
  * Validates if the given content is a valid JSON and looks like a basic OpenAPI/Swagger spec.
  * @param content The string content of the file.
  * @returns The parsed OpenAPI spec object if valid, otherwise throws an error.
  */
-export function validateAndParseSwaggerJson(content: string): OpenApiSpec {
-  let spec: OpenApiSpec;
+export async function validateAndParseSwaggerJson(content: string): Promise<OpenApiSpecWithMessages> {
+
+  let openapiSpec: OpenApiSpec;
+  let result: OpenApiSpecWithMessages;
   try {
-    spec = JSON.parse(content);
+    openapiSpec = JSON.parse(content);
+    const validationResult: ValidationResult = await validateSwaggerSchema(openapiSpec);
+    result = { spec: openapiSpec, validationResult };
   } catch (error) {
-    throw new Error('Invalid JSON file. Please upload a valid JSON OpenAPI/Swagger file.');
+    return { spec: openapiSpec, validationResult: { schemaValidationMessages: [], messages: ['Failed to parse JSON: ' + (error as Error).message] } };
   }
 
   // Basic validation for OpenAPI/Swagger structure
-  if (!spec || (!spec.openapi && !spec.swagger)) {
+  if (!openapiSpec || (!openapiSpec.openapi && !openapiSpec.swagger)) {
     throw new Error('The uploaded JSON does not appear to be a valid OpenAPI (Swagger) specification. Missing "openapi" or "swagger" property.');
   }
-  if (!spec.info || !spec.info.title || !spec.info.version) {
+  if (!openapiSpec.info || !openapiSpec.info.title || !openapiSpec.info.version) {
     throw new Error('Invalid OpenAPI (Swagger) specification: Missing or incomplete "info" object (title and version are required).');
   }
-  if (!spec.paths) {
+  if (!openapiSpec.paths) {
     throw new Error('Invalid OpenAPI (Swagger) specification: Missing "paths" object.');
   }
 
-  return spec;
+  return { spec: openapiSpec, validationResult: result.validationResult };
 }
 
 /**
