@@ -27,7 +27,7 @@ export async function validateSwaggerSchema(spec?: OpenApiSpec, yamlContent?: st
  * @param content The string content of the file.
  * @returns The parsed OpenAPI spec object if valid, otherwise throws an error.
  */
-export async function validateAndParseSwaggerJson(content: string, isYaml = false): Promise<OpenApiSpecWithMessages> {
+export async function validateAndParseSwagger(content: string, isYaml = false): Promise<OpenApiSpecWithMessages> {
 
   let openapiSpec: OpenApiSpec;
   let result: OpenApiSpecWithMessages;
@@ -41,7 +41,7 @@ export async function validateAndParseSwaggerJson(content: string, isYaml = fals
 
   // Basic validation for OpenAPI/Swagger structure
   if (!openapiSpec || (!openapiSpec.openapi && !openapiSpec.swagger)) {
-    throw new Error('The uploaded JSON does not appear to be a valid OpenAPI (Swagger) specification. Missing "openapi" or "swagger" property.');
+    throw new Error('The uploaded content does not appear to be a valid OpenAPI (Swagger) specification. Missing "openapi" or "swagger" property.');
   }
   if (!openapiSpec.info || !openapiSpec.info.title || !openapiSpec.info.version) {
     throw new Error('Invalid OpenAPI (Swagger) specification: Missing or incomplete "info" object (title and version are required).');

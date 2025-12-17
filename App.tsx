@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import FileUpload from './components/FileUpload';
 import SwaggerEditor from './components/SwaggerEditor';
 import SwaggerPreview from './components/SwaggerPreview';
-import { validateAndParseSwaggerJson } from './services/swaggerService';
+import { validateAndParseSwagger } from './services/swaggerService';
 import * as jsyaml from 'js-yaml';
 import { OpenApiSpec, FileState, ValidationResult } from './types';
 
@@ -35,7 +35,7 @@ const App: React.FC = () => {
       //console.debug('File content loaded:', content);
       // get file extension to determine if YAML
       const isYaml = name.endsWith('.yaml') || name.endsWith('.yml');
-      const parsedSpec = await validateAndParseSwaggerJson(content, isYaml);
+      const parsedSpec = await validateAndParseSwagger(content, isYaml);
       setOriginalSpec(parsedSpec.spec);
       parsedSpec.validationResult && setValidationResult(parsedSpec.validationResult);
       setFileState('loaded');
