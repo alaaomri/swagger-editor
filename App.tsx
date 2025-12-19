@@ -94,7 +94,7 @@ const App: React.FC = () => {
         <div className=" mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4"> 
-              <img loading="eager" width="75" height="39" class="mediaContainer-image" src="/logo.svg" alt="GL Swagger Editor & Virtualization Configurator"></img>
+              <img loading="eager" width="75" height="39" class="mediaContainer-image" src="./logo.svg" alt="GL Swagger Editor & Virtualization Configurator"></img>
             
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
