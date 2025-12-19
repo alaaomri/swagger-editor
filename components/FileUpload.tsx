@@ -29,6 +29,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, isLoading, error 
         id="file-upload"
         accept=".json,.yaml,.yml"
         onChange={handleFileChange}
+        onClick={(e) => (e.target as HTMLInputElement).value = ''}
         disabled={isLoading}
         className="hidden"
       />
