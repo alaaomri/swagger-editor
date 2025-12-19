@@ -58,13 +58,23 @@ export interface ModificationConfig {
   applyTimeObjectFix?: boolean;
   // Les autres champs existants peuvent rester, mais seront optionnels
 }
-export interface ValidationMessage {
-  level: 'ERROR' | 'WARNING' | 'INFO';
-  message: string[];
+
+export interface SchemaValidationMessage {
+  level: 'error' | 'warning' | 'info';
+  domain: string;
+  keyword: string;
+  message: string;
+  schema: {
+    loadingURI: string;
+    pointer: string;
+  };
+  instance: {
+    pointer: string;
+  };
 }
 
 export interface ValidationResult {
-  schemaValidationMessages: ValidationMessage[];
+  schemaValidationMessages: SchemaValidationMessage[];
   messages: string[];
 }
 
