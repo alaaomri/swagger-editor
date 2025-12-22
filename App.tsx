@@ -16,9 +16,11 @@ const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'yaml' | 'preview'>('yaml');
   const [version, setVersion] = useState<string>('');
   const [validationResult, setValidationResult] = useState<ValidationResult>([]);
+  const [previewLoading, setPreviewLoading] = useState<boolean>(false);
 
   const handleFileLoaded = useCallback(async (content: string, name: string) => {
     setFileState('loading');
+    setPreviewLoading(true);
     setFileName(name);
     setError(null);
     setOriginalSpec(null);
@@ -28,6 +30,7 @@ const App: React.FC = () => {
     if (!content) {
       setError('Failed to read file or file was empty.');
       setFileState('error');
+      setPreviewLoading(false);
       return;
     }
 
@@ -39,24 +42,32 @@ const App: React.FC = () => {
       setOriginalSpec(parsedSpec.spec);
       parsedSpec.validationResult && setValidationResult(parsedSpec.validationResult);
       setFileState('loaded');
+      setPreviewLoading(false);
       setError(null);
     } catch (e: any) {
       console.error('Error validating/parsing Swagger JSON:', e);
       setError(e.message);
       setFileState('error');
       setOriginalSpec(null);
+      setPreviewLoading(false);
       setValidationResult([{ schemaValidationMessages: [], messages: [e.message] }]);
     }
+
   }, []);
 
-  const handleSpecModified = useCallback((yaml: string) => {
+  const handleSpecModified = useCallback(async (yaml: string) => {
     setModifiedYaml(yaml);
+    setPreviewLoading(true);
     try {
       const json = jsyaml.load(yaml);
       setModifiedSpecJson(json as object);
+      const parsedSpec = await validateAndParseSwagger(yaml, true);
+      parsedSpec.validationResult && setValidationResult(parsedSpec.validationResult);
+      setPreviewLoading(false);
     } catch (e) {
       console.error('Error parsing modified YAML to JSON for preview:', e);
       setModifiedSpecJson(null);
+      setPreviewLoading(false);
     }
   }, []);
 
@@ -259,7 +270,7 @@ const App: React.FC = () => {
 
               {activeTab === 'preview' && (
                 <div className="h-full overflow-auto bg-white">
-                  <SwaggerPreview spec={modifiedSpecJson} validationResult={validationResult} />
+                  <SwaggerPreview spec={modifiedSpecJson} validationResult={validationResult} previewLoading={previewLoading} />
                 </div>
               )}
             </div>
